@@ -54,6 +54,7 @@ class MiLibreria:
         print(time.time()-inicio)
 
     def limpiarImagenM2(self, pos, titulo):
+        print('Limpiar Imagen')
         color = np.array([[255, 0, 0], [0, 255, 0], [0, 0, 255]])
 
         start_time = time.time()
@@ -63,7 +64,7 @@ class MiLibreria:
         mask = cv2.inRange(self.img, lower, upper)
         output = cv2.bitwise_and(self.img, self.img, mask = mask)
         #output[mask == 0] = (255, 255, 255)
-        cv2.imwrite('/home/rocker/Documents/I.A./V.A./'+titulo+'.png', output)
+        cv2.imwrite('/home/rocker/Documents/I.A./V.A./'+titulo+'.bmp', output)
 
         print(time.time() - start_time)
 
@@ -73,7 +74,7 @@ class MiLibreria:
         DE LOS CIRCULOS
     """
     def sobel(self, img):
-
+        print('Sobel')
         container = np.copy(img)
         size = np.size(container, 0), np.size(container, 1)
         cont = 0
@@ -103,6 +104,7 @@ class MiLibreria:
         Y UN ARREGLO QUE CLASIFICA QUÉ PUNTOS PERTENECE A CADA CENTRO
     """
     def kmeans(self, data, k):
+        print('K-means')
         x = np.size(data, 0)
         y = np.size(data, 1)
 
@@ -113,7 +115,6 @@ class MiLibreria:
         cluster_assignments = np.zeros(x)
 
         while (centroids_old != centroids).any():
-            print('si')
             print(str(centroids))
             centroids_old = centroids.copy()
 
@@ -132,6 +133,7 @@ class MiLibreria:
         return (centroids, cluster_assignments)
 
     def calculoArea(self, xC, xData, color):
+        print('Calculo area')
         radio = 0
         bandera = False
         arrayAreas = []
@@ -148,8 +150,9 @@ class MiLibreria:
                 radio = 0
                 bandera = False
     
-    def metodos(self, ruta, data, k, color):
-        img = cv2.cvtColor(cv2.imread(ruta), cv2.COLOR_BGR2GRAY)
+    
+    def metodos(self, ruta, k, color):
+        img = cv2.cvtColor(cv2.imread(str(ruta)), cv2.COLOR_BGR2GRAY)
         img = self.sobel(img)
 
         data = np.copy(img)
@@ -198,7 +201,8 @@ class MiLibreria:
         plt.show()
 
 
-objeto = MiLibreria('/home/rocker/Documents/I.A./V.A./fig-p.png')
+
+objeto = MiLibreria('/home/rocker/Documents/I.A./V.A./fig.png')
 #objeto.histogramaOpenCV()
 
 hilo1 = Process(target=objeto.limpiarImagenM2, args=(0, 'uno', ))

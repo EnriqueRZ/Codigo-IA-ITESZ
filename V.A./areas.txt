@@ -1,0 +1,8 @@
+OpenCV
+Rojos dos circulos
+5169 y 14138
+Verdes dos circulos
+17953 y 5560
+Azules dos circulos
+26058 y 3868
+

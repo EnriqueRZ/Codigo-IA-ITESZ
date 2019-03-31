@@ -8,8 +8,10 @@ image, contours, hierarchy = cv2.findContours(img.copy(), cv2.RETR_TREE, cv2.CHA
 
 cnt = contours[0]
 M = cv2.moments(cnt)
-area = cv2.contourArea(cnt)
-print('cnt='+str(cnt))
-print(str(np.size(cnt,0)))
-print('M='+str(M))
-print('AREA='+str(area))
+
+for i in contours:
+    area = cv2.contourArea(i)
+    print('AREA='+str(area))
+#print('cnt='+str(cnt))
+#print(str(np.size(cnt,0)))
+#print('M='+str(M))
