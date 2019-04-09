@@ -24,8 +24,7 @@ def sobelOperator(img):
                 container[i][j] = 0
 
             if gx > 10 and gy > 10:
-                lis.append([i,j])
-                 
+                lis.append([i,j]) 
     return lis
 
 def kmeans(data, k):
@@ -58,8 +57,7 @@ def kmeans(data, k):
     return (centroids, cluster_assignments)
    
 
-img = cv2.cvtColor(cv2.imread('/home/rocker/Documents/I.A./V.A./azul.png'), cv2.COLOR_BGR2GRAY)
-img2 = cv2.imread('/home/rocker/Documents/I.A./V.A./azul.png')
+img = cv2.cvtColor(cv2.imread('/home/rocker/Documents/I.A./V.A./uno.png'), cv2.COLOR_BGR2GRAY)
 img = sobelOperator(img)
 #print( str( np.size(img, 0)) )
 data = np.copy(img)
@@ -82,7 +80,6 @@ print('xC = '+str(centroids[:,0]))
 
 cluster_assignments = (k_means_result[1]).tolist()
 
-"""
 colors = ['r', 'g', 'b']
 f = lambda x: colors[int(x)]
 cluster_assignments = list(map(f, cluster_assignments))
@@ -101,7 +98,7 @@ plt.xticks(np.arange(0, 21, 5), fontsize=12)
 plt.yticks(np.arange(-5, 21, 5), fontsize=12)
 
 plt.show()
-"""
+
 
 radio = 0
 bandera = False
@@ -117,14 +114,8 @@ for y in range(xC.shape[0]):
         print('per= '+str(radio))
         radio = 0
         bandera = False
-
-plt.ylim(0, 350)
-plt.xlim(0, 500)
-plt.text(xC[0], yC[0], 'TEXTO')
-plt.imshow(img2)
-plt.show()
             
-
+plt.plot(xData, yData, 'ro')
 
 
 #print('si'+str(data[5]))

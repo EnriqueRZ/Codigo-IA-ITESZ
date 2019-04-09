@@ -12,7 +12,6 @@ import time
 import matplotlib.pyplot as plt
 from multiprocessing import Process
 from scipy.spatial import distance_matrix
-from math import pi
 
 class MiLibreria:
 
@@ -54,7 +53,7 @@ class MiLibreria:
 
         print(time.time()-inicio)
 
-    def limpiarImagenM2(self, pos, rutaSave, titulo):
+    def limpiarImagenM2(self, pos, titulo):
         print('Limpiar Imagen')
         color = np.array([[255, 0, 0], [0, 255, 0], [0, 0, 255]])
 
@@ -65,7 +64,7 @@ class MiLibreria:
         mask = cv2.inRange(self.img, lower, upper)
         output = cv2.bitwise_and(self.img, self.img, mask = mask)
         #output[mask == 0] = (255, 255, 255)
-        cv2.imwrite(rutaSave+titulo+'.png', output)
+        cv2.imwrite('/home/rocker/Documents/I.A./V.A./'+titulo+'.bmp', output)
 
         print(time.time() - start_time)
 
@@ -109,35 +108,35 @@ class MiLibreria:
         x = np.size(data, 0)
         y = np.size(data, 1)
 
-        centroidesIniciales = np.random.choice(x, k, replace=False)
-        centroides = data[centroidesIniciales]
+        initial_centroids = np.random.choice(x, k, replace=False)
+        centroids = data[initial_centroids]
 
-        centroidesViejos = np.zeros((k, y))
-        clusterAsignado = np.zeros(x)
+        centroids_old = np.zeros((k, y))
+        cluster_assignments = np.zeros(x)
 
-        while (centroidesViejos != centroides).any():
-            print(str(centroides))
-            centroidesViejos = centroides.copy()
+        while (centroids_old != centroids).any():
+            print(str(centroids))
+            centroids_old = centroids.copy()
 
-            dist_matrix = distance_matrix(data, centroides, p=2)
+            dist_matrix = distance_matrix(data, centroids, p=2)
 
             for i in np.arange(x):
                 d = dist_matrix[i]
                 closest_centroid = (np.where(d == np.min(d)))[0][0]
 
-                clusterAsignado[i] = closest_centroid
+                cluster_assignments[i] = closest_centroid
 
             for j in np.arange(k):
-                Xj = data[clusterAsignado == j]
-                centroides[j] = np.apply_along_axis(np.mean, axis=0, arr=Xj)
+                Xj = data[cluster_assignments == j]
+                centroids[j] = np.apply_along_axis(np.mean, axis=0, arr=Xj)
 
-        return centroides, clusterAsignado
+        return (centroids, cluster_assignments)
 
-    def calculoArea(self, xC, yC, xData, color):
+    def calculoArea(self, xC, xData, color):
         print('Calculo area')
         radio = 0
         bandera = False
-
+        arrayAreas = []
         for y in range(xC.shape[0]):
             
             for j in xData:
@@ -146,8 +145,7 @@ class MiLibreria:
                     radio += 1
 
             if bandera == True:
-                area = pi * ((radio/2)**2)
-                print('Radio '+str(color)+' = '+str(radio/2))
+                area = 3.1416 * ((radio/2)**2)
                 print('Area '+str(color)+' = '+str(area))
                 radio = 0
                 bandera = False
@@ -170,9 +168,7 @@ class MiLibreria:
         xC = centroids[:,0]
         yC = centroids[:,1]
         
-        self.calculoArea(xC, yC, xData, color)
-
-        
+        self.calculoArea(xC, xData, color)
 
     """
         MÉTODO PARA OBTENER "A MANO" LA CANTIDAD DE REPETICIONES DE LOS
@@ -205,7 +201,7 @@ class MiLibreria:
         plt.show()
 
 
-"""
+
 objeto = MiLibreria('/home/rocker/Documents/I.A./V.A./fig.png')
 #objeto.histogramaOpenCV()
 
@@ -220,4 +216,3 @@ hilo3.start()
 hilo1.join()
 hilo2.join()
 hilo3.join()
-"""

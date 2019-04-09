@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-img = cv2.imread('/home/rocker/Documents/I.A./V.A./Pruebas/azul.png', 0)
+img = cv2.imread('/home/rocker/Documents/I.A./V.A./uno.png', 0)
 ret,thresh = cv2.threshold(img,255,255,255)
 
 image, contours, hierarchy = cv2.findContours(img.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
