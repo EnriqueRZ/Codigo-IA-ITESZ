@@ -3,6 +3,7 @@ import time
 import matplotlib.pyplot as plt
 from multiprocessing import Process
 from colorama import init, Fore, Back, Style
+import matplotlib.animation as animation
 
 class Abejas:
 
@@ -32,22 +33,18 @@ class Abejas:
             con un tamaño igual a n_fuentes, con (x,y)
             desde -10 hasta 100
         """ 
-        self.flores = np.random.randint(0,100, size=(self.n_fuentes, 2), dtype=int)
-        #print(str(self.flores[0][0])+str(self.flores[1][0]))
-        #plt.plot(self.flores[:,0], self.flores[:,1], 'ro')
-        #plt.show()
-        #print(self.flores)
+        self.flores = np.random.randint(0,1000, size=(self.n_fuentes, 2), dtype=int)
 
     def funcionAptitud(self):
+        """Calcular la función de aptitud para todas las (x,y)
+        """
         x = self.flores[:,0]
         y = self.flores[:,1]
         for i in range(self.n_fuentes):
             self.aptitud[i] = x[i] + y[i]
-        #print(self.aptitud)
 
     def c_probabilidad(self):
         suma = self.aptitud.sum()
-        #print('suma'+str(suma))
         self.probabilidad = np.divide(self.aptitud, suma)
         
         self.sum_probabilidad[:,0] = self.probabilidad[:,0]
@@ -55,7 +52,6 @@ class Abejas:
             self.sum_probabilidad[i][1] = i
 
         self.sum_probabilidad = self.sum_probabilidad[np.argsort(self.sum_probabilidad[:,0])] 
-        #print(self.sum_probabilidad)
         
         aux = 0
         for i in range(self.n_fuentes):
@@ -63,9 +59,6 @@ class Abejas:
             aux = self.sum_probabilidad[i][0]
 
         np.set_printoptions(suppress=True)     
-        #print(self.sum_probabilidad)
-        
-        #print(self.probabilidad)
 
     def imprimir(self):
         print(Fore.GREEN+'FLORES--APTITUD--PROBABILIDAD--CONTADOR'+Fore.RESET)
@@ -79,75 +72,89 @@ class Abejas:
 
     def nuevasSoluciones(self):
         abejas = int(self.n_fuentes * .45)
-        self.arrayAbejas = np.random.uniform(0,1, size=(abejas))
-        arraySelecionados = np.zeros((int(abejas), 1), dtype=int)
+        arraySelecionados = []
         self.arrayColores = []
-        #print(self.arrayAbejas)
-        #print(str(abejas))
-
-        cont = -1
-        print(self.sum_probabilidad[:,1])
-        for i in self.arrayAbejas:
-            for j in range(self.n_fuentes-1):
-                if self.sum_probabilidad[j][0] >= i <= self.sum_probabilidad[j+1][0]:
-                    cont += 1
-                    aux = (int(self.sum_probabilidad[j][1]))
-                    if not aux in arraySelecionados:
-                        arraySelecionados[cont] = aux
-                        break
-                    else:
-                        x = cont
-                        k = 0
-                        while True:
-                            aux = (int(self.sum_probabilidad[k][1]))
-                            if not aux in arraySelecionados:
-                                arraySelecionados[x] = aux
-                                break
-                            else:
-                                k += 1
-        print(arraySelecionados)
-
+        bandera = False
         for i in range(abejas):
-            fi = np.random.uniform(-1, 1)
-            #print(str(fi))
+            while True:
+                posible = np.random.uniform(0,1)
+                for j in range(self.n_fuentes-1):
+                    if self.sum_probabilidad[j][0] >= posible <= self.sum_probabilidad[j+1][0]:
+                        aux = (int(self.sum_probabilidad[j][1]))
+
+                        if not aux in arraySelecionados:
+                            arraySelecionados.append(aux)
+                            bandera = True
+                            break
+                        else:
+                            bandera = False
+                            break
+
+                if bandera == True:
+                    break
+                    
+        fi = np.random.uniform(-1, 1)
+        for i in range(len(arraySelecionados)):
+            
             distinto = self.xKG(i)
             flor = int(arraySelecionados[i])
-            #print('x-y'+str(distinto)+"."+str(flor))
-            xN = self.flores[flor][0] + (fi * (self.flores[flor][0] + self.flores[distinto][0]))
-            yN = self.flores[flor][1] + (fi * (self.flores[flor][1] + self.flores[distinto][1]))
+            
+            xN = self.flores[flor][0] + (fi * (self.flores[flor][0] - self.flores[distinto][0]))
+            yN = self.flores[flor][1] + (fi * (self.flores[flor][1] - self.flores[distinto][1]))
             aN = int(xN + yN)
+
             if aN > int(self.aptitud[flor]):
-                self.flores[flor][0] = xN
-                self.flores[flor][1] = yN
+                self.flores[flor][0] = abs(xN)
+                self.flores[flor][1] = abs(yN)
                 self.arrayColores.append(flor)
-                print('si ',aN,"+",self.aptitud[flor])
-            #else:
-                #print(str('no ')+str(aN)+"+"+str(self.aptitud[flor]))
+                #print('si ',aN,"+",self.aptitud[flor])
 
     def xKG(self, omitir):
+        """
+        while True:
+            posible = np.random.uniform(0,1)
+            for j in range(self.n_fuentes-1):
+                if self.sum_probabilidad[j][0] >= posible <= self.sum_probabilidad[j+1][0]:
+                    aux = (int(self.sum_probabilidad[j][1]))
+                    #print('aux'+str(aux))
+                    return aux
+              
+            
+        """
         while True:
             aux = np.random.randint(0, self.n_fuentes-1)
             if aux != omitir:
                 return aux
+        
     
     def checarLimite(self):
         for i in range(self.n_fuentes):
             if not i in self.arrayColores:
                 self.contador[i] = int(self.contador[i]) - 1
             if int(self.contador[i]) == 0:
-                self.flores[i][0] = np.random.randint(0,100, dtype=int)
-                self.flores[i][1] = np.random.randint(0,100, dtype=int)
+                fi = np.random.uniform(-1, 1)
+                distinto = self.xKG(i)
+
+                xN = self.flores[i][0] + (fi * (self.flores[i][0] - self.flores[distinto][0]))
+                yN = self.flores[i][1] + (fi * (self.flores[i][1] - self.flores[distinto][1]))
+                aN = int(xN + yN)
+
+                self.flores[i][0] = abs(xN)
+                self.flores[i][1] = abs(yN)
                 self.contador[i] = self.n_limite
+
 
     def main(self):
         self.llenarFlores()
         self.funcionAptitud()
         self.c_probabilidad()
         self.imprimir()
-
+        #plt.figure(figsize=(10,10))
         for i in range(1, self.n_repeticiones):
-            plt.plot(self.flores[:,0], self.flores[:,1], 'ro')
+            plt.clf()
+            plt.plot(self.flores[:,0], self.flores[:,1], '+', color='red', markersize=5)
             plt.savefig('/home/rocker/Documents/I.A./S.I./'+str(i)+'.png')
+            
             print('Repetición '+str(i+1))
             self.nuevasSoluciones()
             self.funcionAptitud()
@@ -157,6 +164,10 @@ class Abejas:
             self.c_probabilidad()
             self.imprimir()
 
+        #ani = animation.ArtistAnimation(self.fig, ims, interval=50, blit=True,
+         #                       repeat_delay=1000)
+        #ani.save('/home/rocker/Documents/I.A./S.I./dynamic_images.mp4')
+        #plt.show()
 
-obj = Abejas(10, 20, 10)
+obj = Abejas(100, 50, 5)
 obj.main()
